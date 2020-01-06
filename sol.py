@@ -443,3 +443,40 @@ def circularArrayLoop(nums: List[int]) -> bool:
 # print(circularArrayLoop([3, 1, 2]))
 # print(circularArrayLoop([-2, 1, -1, -2, -2]))
 
+
+# Course Schedule II - Leetcode 210
+# This is a program to find the correct order to complete the courses, such that no dependent courses are omitted.
+# We use DFS topological sorting to solve this or else use the precedence of each courses are arrange them accordingly. 
+
+from collections import defaultdict
+
+class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+        adjList = defaultdict(list)
+        visit = [0]*numCourses
+        output = []
+        for course1, course2 in prerequisites:
+            adjList[course1].append(course2)
+        
+        for course in range(numCourses):
+            if self.topological_sort(course, adjList, visit, output):
+                return []
+        return output
+    
+    def topological_sort(self, course, adjList, visit, output):
+        if visit[course] == -1:
+            return True
+        if visit[course] == 1:
+            return False
+        
+        visit[course] = -1
+        
+        for depends in adjList[course]:
+            if self.topological_sort(depends, adjList, visit, output):
+                return True
+        
+        visit[course] = 1
+        output.append(course)
+
+# solution = Solution()
+# print(solution.findOrder(2, [[0, 1]]))
