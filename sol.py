@@ -346,4 +346,100 @@ def missingNumber(nums: List[int]) -> int:
             
         return int(sum_of_n - sum)
 
-print(missingNumber([0, 1]))
+# print(missingNumber([0, 1]))
+
+
+# Populating next pointers for each node in an fully complete binary tree - Leetcode 116
+# With O(1) space complexity.
+
+class Node:
+    def __init__(self, val: int = 0, left: 'Node' = None, right: 'Node' = None, next: 'Node' = None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.next = next
+
+def connect(root: 'Node') -> 'Node':
+        cur_head = root
+        while cur_head:
+            temp = cur_head
+            prev = None
+            next_head = temp.left
+            if not next_head:
+                break
+            while temp:
+                if prev:
+                    prev.next = temp.left
+                temp.left.next = temp.right
+                prev = temp.right
+                temp = temp.next
+            cur_head = next_head
+        return root
+
+def outputConnector():
+
+    n4 = Node(4)
+    n5 = Node(5)
+    n6 = Node(6)
+    n7 = Node(7)
+    n3 = Node(3, n6, n7)
+    n2 = Node(2, n4, n5)
+    n1 = Node(1, n2, n3)
+
+    root = connect(n1)
+
+    # output = []
+    queue = [root]
+    while queue:
+        node = queue.pop(0)
+        print(node.val)
+        print(node.next.val if node.next != None else 'no node')
+        if node.left:
+            queue.append(node.left)
+            print(node.left.val)
+            print(node.left.next.val if node.left.next != None else 'no node')
+        if node.right:
+            queue.append(node.right)
+            print(node.right.val)
+            print(node.right.next.val if node.right.next != None else 'no node')
+
+
+# output print is wrong, the original output should be [1,#,2,3,#,4,5,6,7,#]
+# outputConnector()
+
+# Circular Array Loop - leetcode 457
+# To find whether the circular array contains any loop while traversing through the keys
+
+def circularArrayLoop(nums: List[int]) -> bool:
+    n = len(nums)
+    if n <= 1: return False
+    for i,v in enumerate(nums):
+        head = i
+        # print("head", head)
+        dir = v
+        while True:
+            step = nums[i]
+            # print("step", step)
+            if step*dir < 0:
+                break
+            next_i = (i+step)%n
+            # print("next",next_i)
+            if next_i == i:
+                break
+            if next_i == head:
+                return True
+            # print("before", nums)
+            # For cases where there is a loop but not starting from the head.
+            # eg: 0 -> 1 -> 2 -> 1 -> 2 ....
+            nums[i] = head - i + (n if dir > 0 else -n)
+            # print("new nums[i]", i, nums[i])
+            # print("After", nums)
+            i = next_i
+            # print("\n")
+        # print("bleh")
+    return False
+
+# print(circularArrayLoop([2, -1, 1, 2, 2]))
+# print(circularArrayLoop([3, 1, 2]))
+# print(circularArrayLoop([-2, 1, -1, -2, -2]))
+
