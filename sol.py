@@ -480,3 +480,132 @@ class Solution:
 
 # solution = Solution()
 # print(solution.findOrder(2, [[0, 1]]))
+
+# Generate Paranthesis - Leetcode 22
+# This program is used to generate various combinations of paranthesis given a number of paranthesis.
+# It is done using recursive calls to the same helper function inorder to create the various possibilities.
+
+def generateParenthesis(n: int) -> List[str]:
+    if n == 0:
+        return [""]
+    output = []
+    
+    def helper(comb, a, b):
+        if b < a:
+            return
+        if a == 0:
+            comb = comb + ')'*b
+            output.append(comb)
+            return
+        
+        helper(comb + '(', a-1, b)
+        helper(comb + ')', a, b-1)
+    
+    helper('', n, n)
+    return output
+
+# print(generateParenthesis(3))
+
+# Sliding window maximum - Leetcode 239
+# This program is to find the maximum subarray from the given input by sliding window method, it passes a smaller frame and the max value in that frame is in the output.
+# Done using heapq to attain max efficiency. Time complexity is linear in the case.
+# Another method to do this is by attaining the max of each window using the max function. (This method is more useful for saving space but slower)
+# For improvement, we can maybe try and generate the heapq method on our own to save time i.e. convert heapq functionality to simple python code.
+import heapq
+
+# def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
+    # if len(nums) == 0:
+    #     return []
+    # output = []
+    # [output.append(max(nums[i:i+k])) for i in range(0, len(nums)-k+1)]
+    # return output
+
+def maxSlidingWindow(nums: List[int], k: int) -> List[int]:
+    if len(nums) == 0:
+        return []
+    if k >= len(nums):
+        return [max(nums)]
+    heap = []
+    output = []
+    for i in range(0, k):
+        heapq.heappush(heap, (-nums[i], i))
+    output.append(max(nums[0:k]))
+    for i in range(k, len(nums)):
+        heapq.heappush(heap, (-nums[i], i))
+        while heap[0][1] <= i - k:
+            heapq.heappop(heap)
+        output.append(-heap[0][0])
+    return output
+
+# print(maxSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3))
+
+# Most profit assigning work - Leetcode 826
+# This program is used to find the maximum profit able to obtain by a list of workers depending on the difficulty level of the job as well as the profit of the job
+# It is solved using two ways, heapq as well as using zip method and sorted to sort the most profitting jobs and solve accordingly.
+# The zip method is faster compared to the heapq method.
+
+# def maxProfitAssignment(difficulty: List[int], profit: List[int], worker: List[int]) -> int:
+#     helper = []
+#     heapq.heapify(helper)
+#     for i in range(0, len(difficulty)):
+#         heapq.heappush(helper, (-profit[i], difficulty[i]))
+        
+#     worker.sort()
+#     maxProfit = 0
+    
+#     while worker and helper:
+#         if worker[-1] >= helper[0][1]:
+#             maxProfit -= helper[0][0]
+#             worker.pop()
+#         else:
+#             heapq.heappop(helper)
+    
+#     return maxProfit
+
+def maxProfitAssignment(difficulty: List[int], profit: List[int], worker: List[int]) -> int:
+        
+    taskProfitPairs = sorted(list(zip(difficulty, profit)), key=lambda pair: pair[0])
+    sortedTasks = [v[0] for v in taskProfitPairs]
+    n = len(sortedTasks)
+    money = 0
+    lastExploredTask = 0
+    lastProfit = 0
+    for ability in sorted(worker):
+        while lastExploredTask < n and ability >= sortedTasks[lastExploredTask]:
+            currProfit = taskProfitPairs[lastExploredTask][1]
+            if currProfit > lastProfit:
+                lastProfit = currProfit
+            lastExploredTask += 1
+        money += lastProfit
+    return money
+
+# print(maxProfitAssignment([2,4,6,8,10], [10,20,30,40,50], [4,5,6,7]))
+
+# Task Scheduler - Leetcode 621
+# This program aims to find the least amount of time taken to run these number of tasks considering the amount of gap in running the same tasks again, specified by n.
+
+def leastInterval(tasks: List[str], n: int) -> int:
+    if len(tasks) <= 1 or n == 0:
+        return len(tasks)
+    d = dict()
+    for task in tasks:
+        if task in d:
+            d[task] += 1
+        else:
+            d[task] = 1
+    vals = []
+    for i in d:
+        vals.append(d[i])
+    vals.sort(reverse=True)
+    if len(tasks) / (n+1) >= vals[0]:
+        return len(tasks)
+    else:
+        idle = 0
+        for i in range(len(vals)):
+            if vals[i] == vals[0]:
+                idle += 1
+        # This is a on-the-go formula to return the number of time cycles needed for runnning these tasks.
+        return (vals[0] - 1)*(n + 1) + idle
+    
+# print(leastInterval(["A","A","A","B","B","B"], 2))
+
