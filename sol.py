@@ -609,3 +609,36 @@ def leastInterval(tasks: List[str], n: int) -> int:
     
 # print(leastInterval(["A","A","A","B","B","B"], 2))
 
+# Course schedule - Leetcode 207
+# This is a pre cursor to the course schedule 2 question in leetcode. It asks us to find if the given courses and dependencies are actually possible in completion.
+# If there occurs a cycle in the courses and dependencies, then it is not possible to complete the given courses.
+# Using topological sort or keeping track of the courses already complete and ongoing, we can find if we generatae a cycle or not.
+
+from collections import defaultdict
+class Solution_Course_schedule:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        visit = [0]*numCourses
+        adjList = defaultdict(list)
+        for course1, course2 in prerequisites:
+            adjList[course1].append(course2)
+        
+        for course in range(numCourses):
+            if self.topSort(course, adjList, visit):
+                return False
+        return True
+    
+    def topSort(self, course, adjList, visit):
+        if visit[course] == -1:
+            return True
+        if visit[course] == 1:
+            return False
+        visit[course] = -1
+        
+        for depends in adjList[course]:
+            if self.topSort(depends, adjList, visit):
+                return True
+        visit[course] = 1
+
+op = Solution_Course_schedule()
+# print(op.canFinish(2, [[1,0]]))
+
